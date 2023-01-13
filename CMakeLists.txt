@@ -54,6 +54,7 @@ set(SRC
 	src/fx/Effect.cpp
 	src/fx/EffectReader.cpp
 	src/fx/Envelope.cpp
+	src/fx/Equalizer.cpp
 	src/fx/Fader.cpp
 	src/fx/FaderReader.cpp
 	src/fx/HighpassCalculator.cpp
@@ -166,6 +167,7 @@ set(PUBLIC_HDR
 	include/fx/Effect.h
 	include/fx/EffectReader.h
 	include/fx/Envelope.h
+	include/fx/Equalizer.h
 	include/fx/Fader.h
 	include/fx/FaderReader.h
 	include/fx/HighpassCalculator.h

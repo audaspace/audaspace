@@ -26,6 +26,7 @@
 #include "fx/ADSR.h"
 #include "fx/Delay.h"
 #include "fx/Envelope.h"
+#include "fx/Equalizer.h"
 #include "fx/Fader.h"
 #include "fx/Highpass.h"
 #include "fx/IIRFilter.h"
@@ -731,6 +732,15 @@ AUD_API AUD_Sound* AUD_Sound_mutable(AUD_Sound* sound)
 	{
 		return nullptr;
 	}
+}
+AUD_API AUD_Sound* AUD_Sound_equalize(AUD_Sound* sound, float *definition, int size, float maxFreqEq, int sizeConversion)
+{
+	assert(sound);
+
+	std::shared_ptr<Buffer> buf = std::shared_ptr<Buffer>(new Buffer(sizeof(float)*size));
+	std::memcpy(buf->getBuffer(), definition, sizeof(float)*size);
+	AUD_Sound *equalizer=new AUD_Sound(new Equalizer(*sound, buf, size, maxFreqEq, sizeConversion));
+	return equalizer;
 }
 
 #ifdef WITH_CONVOLUTION
