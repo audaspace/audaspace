@@ -251,7 +251,7 @@ bool SequenceHandle::seek(double position)
 	double target_frame = 0;
 	if(pitch_property != nullptr)
 	{
-		int frame_start = (m_entry->m_begin + m_entry->m_skip) * m_entry->m_sequence_data->getFPS();
+		int frame_start = (m_entry->m_begin - m_entry->m_skip) * m_entry->m_sequence_data->getFPS();
 		int i = 0;
 		while(seek_frame > 0)
 		{
