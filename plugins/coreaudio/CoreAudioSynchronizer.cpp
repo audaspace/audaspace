@@ -121,7 +121,7 @@ void CoreAudioSynchronizer::setSyncCallback(ISynchronizer::syncFunction function
 
 int CoreAudioSynchronizer::isPlaying()
 {
-	return m_playing;
+	return m_playing ? 1 : -1;
 }
 
 AUD_NAMESPACE_END
