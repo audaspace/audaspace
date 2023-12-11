@@ -101,6 +101,8 @@ set(SRC
 	src/respec/ConverterReader.cpp
 	src/respec/JOSResample.cpp
 	src/respec/JOSResampleReaderCoeff.cpp
+	src/respec/JOSResampleReaderCoeffMedium.cpp
+	src/respec/JOSResampleReaderCoeffLow.cpp
 	src/respec/JOSResampleReader.cpp
 	src/respec/LinearResample.cpp
 	src/respec/LinearResampleReader.cpp

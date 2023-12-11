@@ -35,20 +35,30 @@ class AUD_API JOSResampleReader : public ResampleReader
 private:
 	typedef void (JOSResampleReader::*resample_f)(double target_factor, int length, sample_t* buffer);
 
+	static const int m_len_high;
+	static const int m_len_medium;
+	static const int m_len_low;
+	static const int m_L_high;
+	static const int m_L_medium;
+	static const int m_L_low;
+	static const float m_coeff_high[];
+	static const float m_coeff_medium[];
+	static const float m_coeff_low[];
+
 	/**
 	 * The half filter length.
 	 */
-	static const int m_len;
+	int m_len;
 
 	/**
 	 * The sample step size for the filter.
 	 */
-	static const int m_L;
+	int m_L;
 
 	/**
 	 * The filter coefficients.
 	 */
-	static const float m_coeff[];
+	const float* m_coeff;
 
 	/**
 	 * The reader channels.
@@ -115,12 +125,19 @@ private:
 	void AUD_LOCAL do_resample(double target_factor, int length, sample_t* buffer);
 
 public:
+	enum Quality
+	{
+		QUALITY_LOW = 0,
+		QUALITY_MEDIUM,
+		QUALITY_HIGH,
+	};
+
 	/**
 	 * Creates a resampling reader.
 	 * \param reader The reader to mix.
 	 * \param rate The target sampling rate.
 	 */
-	JOSResampleReader(std::shared_ptr<IReader> reader, SampleRate rate);
+	JOSResampleReader(std::shared_ptr<IReader> reader, SampleRate rate, Quality = QUALITY_HIGH);
 
 	virtual void seek(int position);
 	virtual int getLength() const;
