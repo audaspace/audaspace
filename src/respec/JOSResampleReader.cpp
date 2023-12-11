@@ -20,9 +20,27 @@
 #include <cmath>
 #include <cstring>
 
+#if defined(__x86_64__) || defined(_M_X64) || defined(__SSE2__)
+#define HAVE_SSE2
+#include <immintrin.h>
+#endif
+
+#if defined(HAVE_SSE2)
+static inline int lrint_impl(double x)
+{
+	return _mm_cvtsd_si32(_mm_load_sd(&x));
+}
+#else
+static inline int lrint_impl(double x)
+{
+	return lrint(x);
+}
+#endif
+
+
 #define RATE_MAX 256
 #define SHIFT_BITS 12
-#define double_to_fp(x) (lrint(x * double(1 << SHIFT_BITS)))
+#define double_to_fp(x) (lrint_impl(x * double(1 << SHIFT_BITS)))
 #define int_to_fp(x) (x << SHIFT_BITS)
 #define fp_to_int(x) (x >> SHIFT_BITS)
 #define fp_to_double(x) (x * 1.0/(1 << SHIFT_BITS))
