@@ -111,6 +111,9 @@ private:
 	void AUD_LOCAL resample_mono(double target_factor, int length, sample_t* buffer);
 	void AUD_LOCAL resample_stereo(double target_factor, int length, sample_t* buffer);
 
+	template <typename T>
+	void AUD_LOCAL do_resample(double target_factor, int length, sample_t* buffer);
+
 public:
 	/**
 	 * Creates a resampling reader.
