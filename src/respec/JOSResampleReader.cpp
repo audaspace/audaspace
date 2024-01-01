@@ -21,11 +21,7 @@
 #include <cstring>
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(__SSE2__)
-#define HAVE_SSE2
 #include <immintrin.h>
-#endif
-
-#if defined(HAVE_SSE2)
 static inline int lrint_impl(double x)
 {
 	return _mm_cvtsd_si32(_mm_load_sd(&x));
@@ -59,17 +55,17 @@ JOSResampleReader::JOSResampleReader(std::shared_ptr<IReader> reader, SampleRate
 {
 	switch(quality)
 	{
-	case QUALITY_LOW:
+	case Quality::LOW:
 		m_len = m_len_low;
 		m_L = m_L_low;
 		m_coeff = m_coeff_low;
 		break;
-	case QUALITY_MEDIUM:
+	case Quality::MEDIUM:
 		m_len = m_len_medium;
 		m_L = m_L_medium;
 		m_coeff = m_coeff_medium;
 		break;
-	case QUALITY_HIGH:
+	case Quality::HIGH:
 		m_len = m_len_high;
 		m_L = m_L_high;
 		m_coeff = m_coeff_high;
@@ -116,7 +112,7 @@ void JOSResampleReader::updateBuffer(int size, double factor, int samplesize)
 }
 
 template<typename T>
-void JOSResampleReader::do_resample(double target_factor, int length, sample_t* buffer)
+void JOSResampleReader::resample(double target_factor, int length, sample_t* buffer)
 {
 	const sample_t* buf = m_buffer.getBuffer();
 
@@ -241,7 +237,7 @@ void JOSResampleReader::do_resample(double target_factor, int length, sample_t* 
 	}
 }
 
-void JOSResampleReader::resample(double target_factor, int length, sample_t* buffer)
+void JOSResampleReader::resample_generic(double target_factor, int length, sample_t* buffer)
 {
 	struct OpGeneric
 	{
@@ -266,7 +262,7 @@ void JOSResampleReader::resample(double target_factor, int length, sample_t* buf
 			} while(channel);
 		}
 	};
-	do_resample<OpGeneric>(target_factor, length, buffer);
+	resample<OpGeneric>(target_factor, length, buffer);
 }
 void JOSResampleReader::resample_mono(double target_factor, int length, sample_t* buffer)
 {
@@ -283,7 +279,7 @@ void JOSResampleReader::resample_mono(double target_factor, int length, sample_t
 			data--;
 		}
 	};
-	do_resample<OpMono>(target_factor, length, buffer);
+	resample<OpMono>(target_factor, length, buffer);
 }
 void JOSResampleReader::resample_stereo(double target_factor, int length, sample_t* buffer)
 {
@@ -302,7 +298,7 @@ void JOSResampleReader::resample_stereo(double target_factor, int length, sample
 			sums[1] += data[2] * v;
 		}
 	};
-	do_resample<OpStereo>(target_factor, length, buffer);
+	resample<OpStereo>(target_factor, length, buffer);
 }
 
 void JOSResampleReader::seek(int position)
@@ -357,7 +353,7 @@ void JOSResampleReader::read(int& length, bool& eos, sample_t* buffer)
 			m_resample = &JOSResampleReader::resample_stereo;
 			break;
 		default:
-			m_resample = &JOSResampleReader::resample;
+			m_resample = &JOSResampleReader::resample_generic;
 			break;
 		}
 	}

@@ -35,14 +35,41 @@ class AUD_API JOSResampleReader : public ResampleReader
 private:
 	typedef void (JOSResampleReader::*resample_f)(double target_factor, int length, sample_t* buffer);
 
+	/**
+	 * The half filter length for Quality::HIGH setting. 
+	 */
 	static const int m_len_high;
+	/**
+	 * The half filter length for Quality::MEDIUM setting.
+	 */
 	static const int m_len_medium;
+	/**
+	 * The half filter length for Quality::LOW setting.
+	 */
 	static const int m_len_low;
+	/**
+	 * The filter sample step size for Quality::HIGH setting.
+	 */
 	static const int m_L_high;
+	/**
+	 * The filter sample step size for Quality::MEDIUM setting.
+	 */
 	static const int m_L_medium;
+	/**
+	 * The filter sample step size for Quality::LOW setting.
+	 */
 	static const int m_L_low;
+	/**
+	 * The filter coefficients for Quality::HIGH setting.
+	 */
 	static const float m_coeff_high[];
+	/**
+	 * The filter coefficients for Quality::MEDIUM setting.
+	 */
 	static const float m_coeff_medium[];
+	/**
+	 * The filter coefficients for Quality::LOW setting.
+	 */
 	static const float m_coeff_low[];
 
 	/**
@@ -117,19 +144,19 @@ private:
 	 */
 	void AUD_LOCAL updateBuffer(int size, double factor, int samplesize);
 
-	void AUD_LOCAL resample(double target_factor, int length, sample_t* buffer);
+	void AUD_LOCAL resample_generic(double target_factor, int length, sample_t* buffer);
 	void AUD_LOCAL resample_mono(double target_factor, int length, sample_t* buffer);
 	void AUD_LOCAL resample_stereo(double target_factor, int length, sample_t* buffer);
 
 	template <typename T>
-	void AUD_LOCAL do_resample(double target_factor, int length, sample_t* buffer);
+	void AUD_LOCAL resample(double target_factor, int length, sample_t* buffer);
 
 public:
-	enum Quality
+	enum class Quality
 	{
-		QUALITY_LOW = 0,
-		QUALITY_MEDIUM,
-		QUALITY_HIGH,
+		LOW = 0,
+		MEDIUM,
+		HIGH,
 	};
 
 	/**
@@ -137,7 +164,7 @@ public:
 	 * \param reader The reader to mix.
 	 * \param rate The target sampling rate.
 	 */
-	JOSResampleReader(std::shared_ptr<IReader> reader, SampleRate rate, Quality = QUALITY_HIGH);
+	JOSResampleReader(std::shared_ptr<IReader> reader, SampleRate rate, Quality = Quality::HIGH);
 
 	virtual void seek(int position);
 	virtual int getLength() const;
