@@ -100,7 +100,7 @@ set(SRC
 	src/respec/ConverterFunctions.cpp
 	src/respec/ConverterReader.cpp
 	src/respec/JOSResample.cpp
-	src/respec/JOSResampleReaderCoeff.cpp
+	src/respec/JOSResampleReaderCoeffHigh.cpp
 	src/respec/JOSResampleReaderCoeffMedium.cpp
 	src/respec/JOSResampleReaderCoeffLow.cpp
 	src/respec/JOSResampleReader.cpp
