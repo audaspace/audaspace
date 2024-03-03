@@ -145,6 +145,13 @@ void CoreAudioDevice::open()
 	}
 }
 
+void CoreAudioDevice::close()
+{
+	AudioOutputUnitStop(m_audio_unit);
+	AudioUnitUninitialize(m_audio_unit);
+	AudioComponentInstanceDispose(m_audio_unit);
+}
+
 CoreAudioDevice::CoreAudioDevice(DeviceSpecs specs, int buffersize) :
 m_playback(false),
 m_audio_unit(nullptr)
@@ -160,13 +167,6 @@ m_audio_unit(nullptr)
 	open();
 	close();
 	create();
-}
-
-void CoreAudioDevice::close()
-{
-	AudioOutputUnitStop(m_audio_unit);
-	AudioUnitUninitialize(m_audio_unit);
-	AudioComponentInstanceDispose(m_audio_unit);
 }
 
 CoreAudioDevice::~CoreAudioDevice()

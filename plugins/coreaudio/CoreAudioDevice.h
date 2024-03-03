@@ -26,9 +26,7 @@
  * The CoreAudioDevice class.
  */
 
-#include <ctime>
 #include <memory>
-#include <thread>
 
 #include <AudioUnit/AudioUnit.h>
 

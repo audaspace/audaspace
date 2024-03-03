@@ -18,11 +18,12 @@
 
 /**
  * @file OpenCloseDevice.h
- * @ingroup plugin
+ * @ingroup devices
  * The OpenCloseDevice class.
  */
 
 #include <thread>
+#include <chrono>
 
 #include "devices/SoftwareDevice.h"
 
@@ -37,12 +38,17 @@ private:
 	/**
 	 * Whether the device is opened.
 	 */
-	bool m_device_opened;
+	bool m_device_opened{false};
 
 	/**
 	 * Whether there is currently playback.
 	 */
-	bool m_playing;
+	bool m_playing{false};
+
+	/**
+	 * Whether thread released the device.
+	 */
+	bool m_delayed_close_finished{false};
 
 	/**
 	 * Thread used to release the device after time delay.
@@ -52,12 +58,7 @@ private:
 	/**
 	 * How long to wait until closing the device..
 	 */
-	std::chrono::milliseconds m_device_close_delay;
-
-	/**
-	 * Whether thread released the device.
-	 */
-	bool m_delayed_close_finished;
+	std::chrono::milliseconds m_device_close_delay{std::chrono::milliseconds(10000)};
 
 	/**
 	 * Time when playback has stopped.
@@ -80,7 +81,7 @@ private:
 	AUD_LOCAL virtual void stop() = 0;
 
 	/**
-	 * Acquires the  device.
+	 * Acquires the device.
 	 */
 	AUD_LOCAL virtual void open() = 0;
 
@@ -94,13 +95,9 @@ private:
 	OpenCloseDevice& operator=(const OpenCloseDevice&) = delete;
 
 protected:
-	virtual void playing(bool playing);
+	OpenCloseDevice() = default;
 
-	/**
-	 * Empty default constructor. To setup the device call the function create()
-	 * and to uninitialize call destroy().
-	 */
-	OpenCloseDevice() : m_device_opened(false), m_delayed_close_finished(false), m_playing(false), m_device_close_delay(std::chrono::milliseconds(10000)) {}
+	virtual void playing(bool playing);
 };
 
 AUD_NAMESPACE_END
