@@ -26,13 +26,13 @@ void OpenCloseDevice::closeAfterDelay()
 		std::this_thread::sleep_for(m_device_close_delay / 10);
 		if(m_playing || m_playback_stopped_time.time_since_epoch().count() == 0)
 			m_playback_stopped_time = std::chrono::steady_clock::now();
-		if(!m_join_immediatelly && std::chrono::steady_clock::now() < m_playback_stopped_time + m_device_close_delay)
+		if(!m_join_immediately && std::chrono::steady_clock::now() < m_playback_stopped_time + m_device_close_delay)
 			continue;
 
 		break;
 	}
 
-	if(!m_join_immediatelly)
+	if(!m_join_immediately)
 		close();
 
 	m_delayed_close_finished = true;
