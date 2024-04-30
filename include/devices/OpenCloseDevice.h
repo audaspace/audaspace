@@ -51,6 +51,11 @@ private:
 	bool m_delayed_close_finished{false};
 
 	/**
+	 * Terminate thread without closing devide. Used when class is destroyed.
+	*/
+	bool m_join_immediately{false};
+
+	/**
 	 * Thread used to release the device after time delay.
 	 */
 	std::thread m_delayed_close_thread;
@@ -96,6 +101,7 @@ private:
 
 protected:
 	OpenCloseDevice() = default;
+	~OpenCloseDevice();
 
 	virtual void playing(bool playing);
 };
