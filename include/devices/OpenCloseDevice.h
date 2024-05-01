@@ -22,8 +22,9 @@
  * The OpenCloseDevice class.
  */
 
-#include <thread>
 #include <chrono>
+#include <condition_variable>
+#include <thread>
 
 #include "devices/SoftwareDevice.h"
 
@@ -32,78 +33,82 @@ AUD_NAMESPACE_BEGIN
 /**
  * This device extends the SoftwareDevice with code for running mixing in a separate thread.
  */
-class AUD_PLUGIN_API OpenCloseDevice : public SoftwareDevice
-{
-private:
-	/**
-	 * Whether the device is opened.
-	 */
-	bool m_device_opened{false};
+class AUD_PLUGIN_API OpenCloseDevice : public SoftwareDevice {
+ private:
+  /**
+   * Whether the device is opened.
+   */
+  bool m_device_opened{false};
 
-	/**
-	 * Whether there is currently playback.
-	 */
-	bool m_playing{false};
+  /**
+   * Whether there is currently playback.
+   */
+  bool m_playing{false};
 
-	/**
-	 * Whether thread released the device.
-	 */
-	bool m_delayed_close_finished{false};
+  /**
+   * Whether thread released the device.
+   */
+  bool m_delayed_close_finished{false};
 
-	/**
-	 * Terminate thread without closing devide. Used when class is destroyed.
-	*/
-	bool m_join_immediately{false};
+  /**
+   * Thread condition to terminate immediately. Used when class is destroyed.
+   */
+  std::condition_variable stop_condition;
 
-	/**
-	 * Thread used to release the device after time delay.
-	 */
-	std::thread m_delayed_close_thread;
+  /**
+   * Mutex for `stop_condition`.
+   */
+  std::mutex stop_condition_mutex;
 
-	/**
-	 * How long to wait until closing the device..
-	 */
-	std::chrono::milliseconds m_device_close_delay{std::chrono::milliseconds(10000)};
+  /**
+   * Thread used to release the device after time delay.
+   */
+  std::thread m_delayed_close_thread;
 
-	/**
-	 * Time when playback has stopped.
-	 */
-	std::chrono::time_point<std::chrono::steady_clock> m_playback_stopped_time;
+  /**
+   * How long to wait until closing the device..
+   */
+  std::chrono::milliseconds m_device_close_delay{std::chrono::milliseconds(10000)};
 
-	/**
-	 * Releases the device after time delay.
-	 */
-	void closeAfterDelay();
+  /**
+   * Time when playback has stopped.
+   */
+  std::chrono::time_point<std::chrono::steady_clock> m_playback_stopped_time;
 
-	/**
-	 * Starts the playback.
-	 */
-	AUD_LOCAL virtual void start() = 0;
+  /**
+   * Releases the device after time delay.
+   */
+  void closeAfterDelay();
 
-	/**
-	 * Stops the playbsck.
-	 */
-	AUD_LOCAL virtual void stop() = 0;
+  /**
+   * Starts the playback.
+   */
+  AUD_LOCAL virtual void start() = 0;
 
-	/**
-	 * Acquires the device.
-	 */
-	AUD_LOCAL virtual void open() = 0;
+  /**
+   * Stops the playbsck.
+   */
+  AUD_LOCAL virtual void stop() = 0;
 
-	/**
-	 * Releases the device.
-	 */
-	AUD_LOCAL virtual void close() = 0;
+  /**
+   * Acquires the device.
+   */
+  AUD_LOCAL virtual void open() = 0;
 
-	// delete copy constructor and operator=
-	OpenCloseDevice(const OpenCloseDevice&) = delete;
-	OpenCloseDevice& operator=(const OpenCloseDevice&) = delete;
+  /**
+   * Releases the device.
+   */
+  AUD_LOCAL virtual void close() = 0;
 
-protected:
-	OpenCloseDevice() = default;
-	~OpenCloseDevice();
+  // delete copy constructor and operator=
+  OpenCloseDevice(const OpenCloseDevice &) = delete;
+  OpenCloseDevice &operator=(const OpenCloseDevice &) = delete;
 
-	virtual void playing(bool playing);
+ protected:
+  OpenCloseDevice() = default;
+  ~OpenCloseDevice();
+
+  virtual void playing(bool playing);
 };
 
 AUD_NAMESPACE_END
