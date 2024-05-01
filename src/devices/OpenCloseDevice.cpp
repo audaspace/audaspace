@@ -21,57 +21,62 @@ AUD_NAMESPACE_BEGIN
 
 void OpenCloseDevice::closeAfterDelay()
 {
-  for (;;) {
-    std::unique_lock<std::mutex> lock(stop_condition_mutex);
-    if (stop_condition.wait_until(lock,
-                                  std::chrono::steady_clock::now() + m_device_close_delay / 10) !=
-        std::cv_status::timeout)
-    {
-      return;
-    }
-    if (m_playing || m_playback_stopped_time.time_since_epoch().count() == 0)
-      m_playback_stopped_time = std::chrono::steady_clock::now();
-    if (std::chrono::steady_clock::now() < m_playback_stopped_time + m_device_close_delay) {
-      continue;
-    }
+	for(;;)
+	{
+		std::unique_lock<std::mutex> lock(stop_condition_mutex);
+		if(stop_condition.wait_until(lock, std::chrono::steady_clock::now() + m_device_close_delay) != std::cv_status::timeout)
+		{
+			return;
+		}
+		if(m_playing || m_playback_stopped_time.time_since_epoch().count() == 0)
+			m_playback_stopped_time = std::chrono::steady_clock::now();
+		if(std::chrono::steady_clock::now() < m_playback_stopped_time + m_device_close_delay)
+		{
+			continue;
+		}
 
-    break;
-  }
+		break;
+	}
 
-  close();
-  m_delayed_close_finished = true;
-  m_device_opened = false;
+	close();
+	m_delayed_close_finished = true;
+	m_device_opened = false;
 }
 
 void OpenCloseDevice::playing(bool playing)
 {
-  if (m_playing != playing) {
-    m_playing = playing;
-    if (playing) {
-      if (!m_device_opened)
-        open();
-      m_device_opened = true;
-      start();
-    }
-    else {
-      stop();
-      m_playback_stopped_time = std::chrono::steady_clock::now();
-      if (m_delayed_close_thread.joinable() && m_delayed_close_finished) {
-        m_delayed_close_thread.join();
-        m_delayed_close_finished = false;
-      }
+	if(m_playing != playing)
+	{
+		m_playing = playing;
+		if(playing)
+		{
+			if(!m_device_opened)
+				open();
+			m_device_opened = true;
+			start();
+		}
+		else
+		{
+			stop();
+			m_playback_stopped_time = std::chrono::steady_clock::now();
+			if(m_delayed_close_thread.joinable() && m_delayed_close_finished)
+			{
+				m_delayed_close_thread.join();
+				m_delayed_close_finished = false;
+			}
 
-      if (m_device_opened && !m_delayed_close_thread.joinable())
-        m_delayed_close_thread = std::thread(&OpenCloseDevice::closeAfterDelay, this);
-    }
-  }
+			if(m_device_opened && !m_delayed_close_thread.joinable())
+				m_delayed_close_thread = std::thread(&OpenCloseDevice::closeAfterDelay, this);
+		}
+	}
 }
 
 OpenCloseDevice::~OpenCloseDevice()
 {
-  if (m_delayed_close_thread.joinable()) {
-    stop_condition.notify_one();
-    m_delayed_close_thread.join();
-  }
+	if(m_delayed_close_thread.joinable())
+	{
+		stop_condition.notify_one();
+		m_delayed_close_thread.join();
+	}
 }
 AUD_NAMESPACE_END
